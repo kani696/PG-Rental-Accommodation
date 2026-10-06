@@ -1,11 +1,16 @@
 const loginForm = document.getElementById("loginForm");
 const message = document.getElementById("message");
+const loginButton = document.getElementById("loginButton");
 
 loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
+
+    // Disable button while login request is being processed
+    loginButton.disabled = true;
+    loginButton.textContent = "Logging in...";
 
     try {
         const response = await fetch(
@@ -48,5 +53,10 @@ loginForm.addEventListener("submit", async (event) => {
             "Unable to connect to the server.";
 
         message.style.color = "red";
+
+    } finally {
+        // Enable button again after request completes
+        loginButton.disabled = false;
+        loginButton.textContent = "Login";
     }
 });
