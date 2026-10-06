@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Property - PG Rental Accommodation Finder</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="registration-card">
+
+            <h1>Add Property</h1>
+
+            <p class="subtitle">
+                List your PG accommodation for students.
+            </p>
+
+            <form id="propertyForm">
+
+                <div class="form-group">
+                    <label for="title">Property Title</label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        placeholder="Example: Comfortable PG near College"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+
+                    <textarea
+                        id="description"
+                        rows="4"
+                        placeholder="Describe the property"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location</label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        placeholder="Example: Coimbatore"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="rent">Monthly Rent</label>
+
+                    <input
+                        type="number"
+                        id="rent"
+                        min="0"
+                        placeholder="Enter monthly rent"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="roomType">Room Type</label>
+
+                    <select id="roomType" required>
+                        <option value="">Select room type</option>
+                        <option value="Single">Single</option>
+                        <option value="Shared">Shared</option>
+                        <option value="Double">Double</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Amenities</label>
+
+                    <label>
+                        <input type="checkbox" name="amenities" value="WiFi">
+                        WiFi
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="amenities" value="Food">
+                        Food
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="amenities" value="Parking">
+                        Parking
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="amenities" value="Laundry">
+                        Laundry
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number</label>
+
+                    <input
+                        type="tel"
+                        id="contactNumber"
+                        placeholder="Enter contact number"
+                        required
+                    >
+                </div>
+
+                <button type="submit">
+                    Add Property
+                </button>
+
+                <p id="message"></p>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <script src="js/add-property.js"></script>
+
+</body>
+
+</html>
