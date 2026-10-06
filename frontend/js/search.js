@@ -17,7 +17,11 @@ searchForm.addEventListener("submit", async (event) => {
         const data = await response.json();
 
         if (!response.ok) {
-            results.innerHTML = `<p>${data.message}</p>`;
+            results.innerHTML = `
+                <div class="registration-card">
+                    <p>${data.message}</p>
+                </div>
+            `;
             return;
         }
 
@@ -32,22 +36,51 @@ searchForm.addEventListener("submit", async (event) => {
 
         results.innerHTML = `
             <div class="registration-card">
+
                 <h2>Search Results</h2>
-                <p>${data.count} property/properties found.</p>
+
+                <p>
+                    ${data.count} property/properties found.
+                </p>
 
                 ${data.properties.map((property) => `
                     <div class="property-result">
+
                         <h3>${property.title}</h3>
-                        <p><strong>Location:</strong> ${property.location}</p>
-                        <p><strong>Rent:</strong> ₹${property.rent}</p>
-                        <p><strong>Room:</strong> ${property.roomType}</p>
-                        <p>${property.description}</p>
+
+                        <p>
+                            <strong>Location:</strong>
+                            ${property.location}
+                        </p>
+
+                        <p>
+                            <strong>Rent:</strong>
+                            ₹${property.rent}
+                        </p>
+
+                        <p>
+                            <strong>Room:</strong>
+                            ${property.roomType}
+                        </p>
+
+                        <p>
+                            ${property.description}
+                        </p>
+
+                        <button
+                            type="button"
+                            onclick="window.location.href='property-details.html?id=${property._id}'">
+                            View Details
+                        </button>
+
                     </div>
                 `).join("")}
+
             </div>
         `;
 
     } catch (error) {
+
         console.error("Search error:", error);
 
         results.innerHTML = `
