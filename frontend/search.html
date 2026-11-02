@@ -1,55 +1,51 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Search Properties - PG Rental Accommodation Finder</title>
-
+    <title>Search PG Properties</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
     <div class="container">
-
         <div class="registration-card">
-
-            <h1>Find a PG</h1>
-
-            <p class="subtitle">
-                Search for PG accommodations by location or property name.
-            </p>
+            <h1>Find Your PG</h1>
+            <p class="subtitle">Search and filter PG accommodations.</p>
 
             <form id="searchForm">
 
                 <div class="form-group">
-                    <label for="searchInput">
-                        Location or Property Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Example: Coimbatore"
-                    >
+                    <label for="searchInput">Location or Property Name</label>
+                    <input type="text" id="searchInput"
+                        placeholder="Example: Coimbatore">
                 </div>
 
-                <button type="submit">
-                    Search Properties
-                </button>
+                <div class="form-group">
+                    <label for="maxRent">Maximum Rent (₹)</label>
+                    <input type="number" id="maxRent"
+                        min="0" placeholder="Enter maximum rent">
+                </div>
+
+                <div class="form-group">
+                    <label for="roomType">Room Type</label>
+                    <select id="roomType">
+                        <option value="">All Rooms</option>
+                        <option value="Single">Single</option>
+                        <option value="Shared">Shared</option>
+                        <option value="Double">Double</option>
+                    </select>
+                </div>
+
+                <button type="submit">Search Properties</button>
 
             </form>
-
         </div>
 
         <div id="results"></div>
-
     </div>
 
     <script src="js/search.js"></script>
-
 </body>
-
 </html>

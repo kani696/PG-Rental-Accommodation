@@ -2,12 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
+dotenv.config();
+
 const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
-
-dotenv.config();
 
 const app = express();
 
@@ -21,7 +21,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 
-// Test route
+// Home route
 app.get("/", (req, res) => {
     res.status(200).json({
         success: true,
@@ -29,13 +29,23 @@ app.get("/", (req, res) => {
     });
 });
 
-// Connect to MongoDB and start server
+// Start server only when this file is run directly
 const startServer = async () => {
-    await connectDB();
+    try {
+        await connectDB();
 
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Server startup failed:", error.message);
+        process.exit(1);
+    }
 };
 
-startServer();
+if (require.main === module) {
+    startServer();
+}
+
+// Export app for testing
+module.exports = app;

@@ -1,5 +1,8 @@
-const Property = require("../models/Property");
 
+const Property = require("../models/Property");
+const ContactMessage = require("../models/ContactMessage");
+
+// 1. Add property
 const addProperty = async (req, res) => {
     try {
         const {
@@ -68,12 +71,16 @@ const addProperty = async (req, res) => {
 };
 
 
-// Search properties
+// 2. Search and filter properties
 const searchProperties = async (req, res) => {
     try {
-        const search = req.query.search || "";
+        const {
+            search = "",
+            maxRent,
+            roomType
+        } = req.query;
 
-        const properties = await Property.find({
+        const filter = {
             $or: [
                 {
                     title: {
@@ -88,7 +95,27 @@ const searchProperties = async (req, res) => {
                     }
                 }
             ]
-        }).sort({ createdAt: -1 });
+        };
+
+        if (maxRent !== undefined && maxRent !== "") {
+            const rentValue = Number(maxRent);
+
+            if (!Number.isFinite(rentValue) || rentValue < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid maximum rent"
+                });
+            }
+
+            filter.rent = { $lte: rentValue };
+        }
+
+        if (roomType) {
+            filter.roomType = roomType;
+        }
+
+        const properties = await Property.find(filter)
+            .sort({ createdAt: -1 });
 
         return res.status(200).json({
             success: true,
@@ -107,7 +134,86 @@ const searchProperties = async (req, res) => {
 };
 
 
+// 3. Get property details by ID
+const getPropertyById = async (req, res) => {
+    try {
+        const property = await Property.findById(req.params.id);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            property
+        });
+
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid property ID"
+        });
+    }
+};
+
+
+// 4. Contact property owner
+const contactOwner = async (req, res) => {
+    try {
+        const {
+            senderName,
+            senderEmail,
+            message
+        } = req.body;
+
+        if (!senderName || !senderEmail || !message) {
+            return res.status(400).json({
+                success: false,
+                message: "All contact fields are required"
+            });
+        }
+
+        const property = await Property.findById(req.params.id);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found"
+            });
+        }
+
+        const inquiry = await ContactMessage.create({
+            property: property._id,
+            owner: property.owner,
+            senderName,
+            senderEmail,
+            message
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Your inquiry has been submitted successfully",
+            inquiryId: inquiry._id
+        });
+
+    } catch (error) {
+        console.error("Contact owner error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to submit your inquiry"
+        });
+    }
+};
+
+
+// Export all controller functions
 module.exports = {
     addProperty,
-    searchProperties
+    searchProperties,
+    getPropertyById,
+    contactOwner
 };
