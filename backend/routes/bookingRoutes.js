@@ -7,8 +7,12 @@ const protect = require("../middleware/authMiddleware");
 
 const {
     createBooking,
-    getMyBookings
+    getMyBookings,
+    getOwnerDashboard
 } = require("../controllers/bookingController");
+
+// Owner dashboard
+router.get("/owner-dashboard", protect, getOwnerDashboard);
 
 // Submit a booking request
 router.post("/", protect, createBooking);

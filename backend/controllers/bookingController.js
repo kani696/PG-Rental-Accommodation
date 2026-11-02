@@ -7,7 +7,6 @@ const createBooking = async (req, res) => {
     try {
         const { propertyId, moveInDate, message } = req.body;
 
-        // Validate required fields
         if (!propertyId || !moveInDate) {
             return res.status(400).json({
                 success: false,
@@ -15,7 +14,6 @@ const createBooking = async (req, res) => {
             });
         }
 
-        // Only students can book a property
         if (req.user.role !== "student") {
             return res.status(403).json({
                 success: false,
@@ -23,7 +21,6 @@ const createBooking = async (req, res) => {
             });
         }
 
-        // Validate property ID
         if (!/^[0-9a-fA-F]{24}$/.test(propertyId)) {
             return res.status(400).json({
                 success: false,
@@ -31,7 +28,6 @@ const createBooking = async (req, res) => {
             });
         }
 
-        // Validate move-in date
         const date = new Date(moveInDate);
 
         if (Number.isNaN(date.getTime()) || date <= new Date()) {
@@ -41,7 +37,6 @@ const createBooking = async (req, res) => {
             });
         }
 
-        // Find the selected property
         const property = await Property.findById(propertyId);
 
         if (!property) {
@@ -51,7 +46,6 @@ const createBooking = async (req, res) => {
             });
         }
 
-        // Prevent owners from booking their own property
         if (property.owner.toString() === req.user.id) {
             return res.status(403).json({
                 success: false,
@@ -59,7 +53,6 @@ const createBooking = async (req, res) => {
             });
         }
 
-        // Create booking request
         const booking = await Booking.create({
             student: req.user.id,
             property: property._id,
@@ -81,6 +74,7 @@ const createBooking = async (req, res) => {
         });
     }
 };
+
 
 // Student views their booking requests
 const getMyBookings = async (req, res) => {
@@ -105,7 +99,69 @@ const getMyBookings = async (req, res) => {
     }
 };
 
+
+// Owner views dashboard
+const getOwnerDashboard = async (req, res) => {
+    try {
+        if (req.user.role !== "owner") {
+            return res.status(403).json({
+                success: false,
+                message: "Only property owners can access the dashboard"
+            });
+        }
+
+        // Get properties belonging to this owner
+        const properties = await Property.find({
+            owner: req.user.id
+        }).sort({ createdAt: -1 });
+
+        // Get booking requests received by this owner
+        const bookings = await Booking.find({
+            owner: req.user.id
+        })
+            .populate("student", "name email")
+            .populate("property", "title location rent")
+            .sort({ createdAt: -1 });
+
+        // Calculate booking status counts
+        const pending = bookings.filter(
+            booking => booking.status === "Pending"
+        ).length;
+
+        const approved = bookings.filter(
+            booking => booking.status === "Approved"
+        ).length;
+
+        const rejected = bookings.filter(
+            booking => booking.status === "Rejected"
+        ).length;
+
+        return res.status(200).json({
+            success: true,
+            dashboard: {
+                totalProperties: properties.length,
+                totalBookings: bookings.length,
+                pendingBookings: pending,
+                approvedBookings: approved,
+                rejectedBookings: rejected,
+                properties,
+                recentBookings: bookings.slice(0, 5)
+            }
+        });
+
+    } catch (error) {
+        console.error("Owner dashboard error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load owner dashboard"
+        });
+    }
+};
+
+
 module.exports = {
     createBooking,
-    getMyBookings
+    getMyBookings,
+    getOwnerDashboard
 };
