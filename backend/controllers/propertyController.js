@@ -36,10 +36,10 @@ const addProperty = async (req, res) => {
             });
         }
 
-        if (Number(rent) < 0) {
+        if (!Number.isFinite(Number(rent)) || Number(rent) <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Rent cannot be negative"
+                message: "Rent must be greater than 0"
             });
         }
 
@@ -210,10 +210,251 @@ const contactOwner = async (req, res) => {
 };
 
 
-// Export all controller functions
+// 5. Get properties belonging to logged-in owner
+const getMyListings = async (req, res) => {
+    try {
+        if (req.user.role !== "owner") {
+            return res.status(403).json({
+                success: false,
+                message: "Only property owners can view their listings"
+            });
+        }
+
+        const properties = await Property.find({
+            owner: req.user.id
+        }).sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            count: properties.length,
+            properties
+        });
+
+    } catch (error) {
+        console.error("Get my listings error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to retrieve your property listings"
+        });
+    }
+};
+
+
+// 6. Update an owner's property
+const updateProperty = async (req, res) => {
+    try {
+        if (req.user.role !== "owner") {
+            return res.status(403).json({
+                success: false,
+                message: "Only property owners can update properties"
+            });
+        }
+
+        const propertyId = req.params.id;
+
+        if (!/^[0-9a-fA-F]{24}$/.test(propertyId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid property ID"
+            });
+        }
+
+        const property = await Property.findById(propertyId);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found"
+            });
+        }
+
+        if (property.owner.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only update your own properties"
+            });
+        }
+
+        const allowedFields = [
+            "title",
+            "description",
+            "location",
+            "rent",
+            "roomType",
+            "amenities",
+            "contactNumber"
+        ];
+
+        const updates = {};
+
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                updates[field] = req.body[field];
+            }
+        });
+
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "No property details provided for update"
+            });
+        }
+
+        if (
+            updates.title !== undefined &&
+            !String(updates.title).trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Property title cannot be empty"
+            });
+        }
+
+        if (
+            updates.description !== undefined &&
+            !String(updates.description).trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Description cannot be empty"
+            });
+        }
+
+        if (
+            updates.location !== undefined &&
+            !String(updates.location).trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Location cannot be empty"
+            });
+        }
+
+        if (updates.rent !== undefined) {
+            const rentValue = Number(updates.rent);
+
+            if (!Number.isFinite(rentValue) || rentValue <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Rent must be greater than 0"
+                });
+            }
+
+            updates.rent = rentValue;
+        }
+
+        if (
+            updates.roomType !== undefined &&
+            !["Single", "Shared", "Double"].includes(updates.roomType)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid room type"
+            });
+        }
+
+        if (
+            updates.amenities !== undefined &&
+            !Array.isArray(updates.amenities)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Amenities must be an array"
+            });
+        }
+
+        if (
+            updates.contactNumber !== undefined &&
+            !String(updates.contactNumber).trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Contact number cannot be empty"
+            });
+        }
+
+        Object.assign(property, updates);
+
+        await property.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Property updated successfully",
+            property
+        });
+
+    } catch (error) {
+        console.error("Update property error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to update property"
+        });
+    }
+};
+
+
+// 7. Delete an owner's property
+const deleteProperty = async (req, res) => {
+    try {
+        if (req.user.role !== "owner") {
+            return res.status(403).json({
+                success: false,
+                message: "Only property owners can delete properties"
+            });
+        }
+
+        const propertyId = req.params.id;
+
+        if (!/^[0-9a-fA-F]{24}$/.test(propertyId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid property ID"
+            });
+        }
+
+        const property = await Property.findById(propertyId);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found"
+            });
+        }
+
+        if (property.owner.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only delete your own properties"
+            });
+        }
+
+        await Property.findByIdAndDelete(propertyId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Property deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Delete property error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to delete property"
+        });
+    }
+};
+
+
+// Export controller functions
 module.exports = {
     addProperty,
     searchProperties,
     getPropertyById,
-    contactOwner
+    contactOwner,
+    getMyListings,
+    updateProperty,
+    deleteProperty
 };

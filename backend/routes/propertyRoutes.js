@@ -7,21 +7,25 @@ const {
     addProperty,
     searchProperties,
     getPropertyById,
-    contactOwner
+    contactOwner,
+    getMyListings,
+    updateProperty,
+    deleteProperty
 } = require("../controllers/propertyController");
 
 const router = express.Router();
 
-// Search properties - public
+// Public routes
 router.get("/search", searchProperties);
-
-// Contact property owner - public inquiry form
 router.post("/:id/contact", contactOwner);
 
-// View individual property details - public
-router.get("/:id", getPropertyById);
+// Owner-only listing management
+router.get("/my-listings", protect, getMyListings);
+router.put("/:id", protect, updateProperty);
+router.delete("/:id", protect, deleteProperty);
 
-// Add property - authenticated owner
+// Existing property routes
 router.post("/", protect, addProperty);
+router.get("/:id", getPropertyById);
 
 module.exports = router;

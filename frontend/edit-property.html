@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Property - PG Finder</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="registration-card">
+
+            <h1>Edit Property Details</h1>
+
+            <p class="subtitle">
+                Update the details of your PG accommodation.
+            </p>
+
+            <form id="editPropertyForm">
+
+                <div class="form-group">
+                    <label for="title">Property Title</label>
+                    <input type="text" id="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="rent">Monthly Rent</label>
+                    <input type="number" id="rent" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomType">Room Type</label>
+                    <select id="roomType" required>
+                        <option value="">Select room type</option>
+                        <option value="Single">Single</option>
+                        <option value="Shared">Shared</option>
+                        <option value="Double">Double</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Amenities</label>
+
+                    <label>
+                        <input type="checkbox" name="amenities" value="WiFi">
+                        WiFi
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="amenities" value="Food">
+                        Food
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="amenities" value="Parking">
+                        Parking
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="amenities" value="Laundry">
+                        Laundry
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number</label>
+                    <input type="tel" id="contactNumber" required>
+                </div>
+
+                <button type="submit" id="updateButton">
+                    Update Property
+                </button>
+
+                <p id="editMessage"></p>
+
+            </form>
+
+            <a href="my-listings.html">Back to My Listings</a>
+
+        </div>
+    </div>
+
+    <script src="js/edit-property.js"></script>
+</body>
+</html>
