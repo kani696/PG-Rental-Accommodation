@@ -20,7 +20,7 @@ searchForm.addEventListener("submit", async (event) => {
         params.append("roomType", roomTypeInput.value);
     }
 
-    results.innerHTML = "<p>Searching...</p>";
+    results.textContent = "Searching...";
 
     try {
         const response = await fetch(
@@ -35,11 +35,7 @@ searchForm.addEventListener("submit", async (event) => {
         }
 
         if (data.properties.length === 0) {
-            results.innerHTML = `
-                <div class="registration-card">
-                    <p>No properties found.</p>
-                </div>
-            `;
+            results.textContent = "No properties found.";
             return;
         }
 
@@ -71,10 +67,74 @@ searchForm.addEventListener("submit", async (event) => {
             room.textContent = `Room: ${property.roomType}`;
 
             const detailsLink = document.createElement("a");
-            detailsLink.href = `property-details.html?id=${encodeURIComponent(property._id)}`;
+            detailsLink.href =
+                `property-details.html?id=${encodeURIComponent(property._id)}`;
             detailsLink.textContent = "View Details";
 
-            item.append(title, location, rent, room, detailsLink);
+            const favouriteButton = document.createElement("button");
+            favouriteButton.type = "button";
+            favouriteButton.textContent = "♡ Add to Favourites";
+
+            favouriteButton.addEventListener("click", async () => {
+                const token = localStorage.getItem("token");
+                const user = JSON.parse(
+                    localStorage.getItem("user") || "null"
+                );
+
+                if (!token) {
+                    alert("Please login as a student to save favourites.");
+                    return;
+                }
+
+                if (!user || user.role !== "student") {
+                    alert("Only students can save favourite properties.");
+                    return;
+                }
+
+                favouriteButton.disabled = true;
+
+                try {
+                    const favouriteResponse = await fetch(
+                        "http://localhost:5000/api/favourites",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                propertyId: property._id
+                            })
+                        }
+                    );
+
+                    const favouriteData = await favouriteResponse.json();
+
+                    if (favouriteResponse.ok) {
+                        favouriteButton.textContent = "♥ Saved to Favourites";
+                        favouriteButton.style.backgroundColor = "green";
+                    } else {
+                        alert(favouriteData.message || "Unable to save favourite.");
+                        favouriteButton.disabled = false;
+                    }
+
+                } catch (error) {
+                    console.error("Favourite error:", error);
+                    alert("Unable to connect to the server.");
+                    favouriteButton.disabled = false;
+                }
+            });
+
+            item.append(
+                title,
+                location,
+                rent,
+                room,
+                detailsLink,
+                document.createElement("br"),
+                favouriteButton
+            );
+
             card.appendChild(item);
         });
 
