@@ -10,7 +10,8 @@ const {
     contactOwner,
     getMyListings,
     updateProperty,
-    deleteProperty
+    deleteProperty,
+    updateAvailability
 } = require("../controllers/propertyController");
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.post("/:id/contact", contactOwner);
 
 // Owner-only listing management
 router.get("/my-listings", protect, getMyListings);
+router.put("/:id/availability", protect, updateAvailability);
 router.put("/:id", protect, updateProperty);
 router.delete("/:id", protect, deleteProperty);
 

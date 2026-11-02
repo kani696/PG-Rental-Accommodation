@@ -32,6 +32,7 @@ async function loadPropertyDetails() {
             ["Location", property.location],
             ["Monthly Rent", `₹${property.rent}`],
             ["Room Type", property.roomType],
+            ["Availability", property.availability || "Available"],
             ["Contact Number", property.contactNumber],
             ["Amenities", (property.amenities || []).join(", ") || "Not specified"]
         ];
@@ -47,7 +48,8 @@ async function loadPropertyDetails() {
         });
 
         const contactLink = document.createElement("a");
-        contactLink.href = `contact-owner.html?id=${encodeURIComponent(property._id)}`;
+        contactLink.href =
+            `contact-owner.html?id=${encodeURIComponent(property._id)}`;
         contactLink.textContent = "Contact Owner";
 
         propertyDetails.appendChild(contactLink);

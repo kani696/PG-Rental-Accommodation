@@ -3,6 +3,7 @@ const searchForm = document.getElementById("searchForm");
 const searchInput = document.getElementById("searchInput");
 const maxRentInput = document.getElementById("maxRent");
 const roomTypeInput = document.getElementById("roomType");
+const availabilityInput = document.getElementById("availability");
 const results = document.getElementById("results");
 
 searchForm.addEventListener("submit", async (event) => {
@@ -18,6 +19,10 @@ searchForm.addEventListener("submit", async (event) => {
 
     if (roomTypeInput.value !== "") {
         params.append("roomType", roomTypeInput.value);
+    }
+
+    if (availabilityInput.value !== "") {
+        params.append("availability", availabilityInput.value);
     }
 
     results.textContent = "Searching...";
@@ -65,6 +70,10 @@ searchForm.addEventListener("submit", async (event) => {
 
             const room = document.createElement("p");
             room.textContent = `Room: ${property.roomType}`;
+
+            const availability = document.createElement("p");
+            availability.textContent =
+                `Availability: ${property.availability || "Available"}`;
 
             const detailsLink = document.createElement("a");
             detailsLink.href =
@@ -130,6 +139,7 @@ searchForm.addEventListener("submit", async (event) => {
                 location,
                 rent,
                 room,
+                availability,
                 detailsLink,
                 document.createElement("br"),
                 favouriteButton

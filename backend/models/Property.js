@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const propertySchema = new mongoose.Schema(
@@ -47,6 +48,12 @@ const propertySchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true
+        },
+
+        availability: {
+            type: String,
+            enum: ["Available", "Not Available"],
+            default: "Available"
         }
     },
     {

@@ -63,6 +63,33 @@ async function loadMyListings() {
             amenities.textContent =
                 `Amenities: ${(property.amenities || []).join(", ") || "Not specified"}`;
 
+            const availabilityLabel = document.createElement("label");
+            availabilityLabel.textContent = "Availability: ";
+
+            const availabilitySelect = document.createElement("select");
+
+            ["Available", "Not Available"].forEach((status) => {
+                const option = document.createElement("option");
+                option.value = status;
+                option.textContent = status;
+                availabilitySelect.appendChild(option);
+            });
+
+            // Older listings without a saved status are treated as Available
+            availabilitySelect.value = property.availability || "Available";
+
+            const updateButton = document.createElement("button");
+            updateButton.type = "button";
+            updateButton.textContent = "Update Availability";
+
+            updateButton.addEventListener("click", () => {
+                updateAvailability(
+                    property._id,
+                    availabilitySelect.value,
+                    updateButton
+                );
+            });
+
             const editLink = document.createElement("a");
             editLink.href =
                 `edit-property.html?id=${encodeURIComponent(property._id)}`;
@@ -82,6 +109,11 @@ async function loadMyListings() {
                 rent,
                 roomType,
                 amenities,
+                availabilityLabel,
+                availabilitySelect,
+                document.createElement("br"),
+                updateButton,
+                document.createElement("br"),
                 editLink,
                 document.createElement("br"),
                 deleteButton
@@ -96,6 +128,46 @@ async function loadMyListings() {
         listingsMessage.textContent =
             "Unable to connect to the server.";
         listingsMessage.style.color = "red";
+    }
+}
+
+
+// Update property availability
+async function updateAvailability(propertyId, availability, button) {
+    button.disabled = true;
+    button.textContent = "Updating...";
+
+    try {
+        const response = await fetch(
+            `http://localhost:5000/api/properties/${encodeURIComponent(propertyId)}/availability`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ availability })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.message || "Unable to update availability.");
+            button.disabled = false;
+            button.textContent = "Update Availability";
+            return;
+        }
+
+        alert("Property availability updated successfully!");
+        loadMyListings();
+
+    } catch (error) {
+        console.error("Update availability error:", error);
+        alert("Unable to connect to the server.");
+
+        button.disabled = false;
+        button.textContent = "Update Availability";
     }
 }
 
@@ -134,7 +206,6 @@ async function deleteProperty(propertyId, button) {
         }
 
         alert("Property deleted successfully!");
-
         loadMyListings();
 
     } catch (error) {

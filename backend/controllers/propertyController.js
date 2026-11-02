@@ -77,7 +77,8 @@ const searchProperties = async (req, res) => {
         const {
             search = "",
             maxRent,
-            roomType
+            roomType,
+            availability
         } = req.query;
 
         const filter = {
@@ -111,7 +112,27 @@ const searchProperties = async (req, res) => {
         }
 
         if (roomType) {
+            if (!["Single", "Shared", "Double"].includes(roomType)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid room type"
+                });
+            }
+
             filter.roomType = roomType;
+        }
+
+        if (availability) {
+            if (!["Available", "Not Available"].includes(availability)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid availability status"
+                });
+            }
+
+           filter.availability = availability === "Available"
+    ? { $in: ["Available", null] }
+    : "Not Available";
         }
 
         const properties = await Property.find(filter)
@@ -301,30 +322,21 @@ const updateProperty = async (req, res) => {
             });
         }
 
-        if (
-            updates.title !== undefined &&
-            !String(updates.title).trim()
-        ) {
+        if (updates.title !== undefined && !String(updates.title).trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Property title cannot be empty"
             });
         }
 
-        if (
-            updates.description !== undefined &&
-            !String(updates.description).trim()
-        ) {
+        if (updates.description !== undefined && !String(updates.description).trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Description cannot be empty"
             });
         }
 
-        if (
-            updates.location !== undefined &&
-            !String(updates.location).trim()
-        ) {
+        if (updates.location !== undefined && !String(updates.location).trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Location cannot be empty"
@@ -448,7 +460,69 @@ const deleteProperty = async (req, res) => {
 };
 
 
-// Export controller functions
+// 8. Update property availability
+const updateAvailability = async (req, res) => {
+    try {
+        if (req.user.role !== "owner") {
+            return res.status(403).json({
+                success: false,
+                message: "Only property owners can update availability"
+            });
+        }
+
+        const propertyId = req.params.id;
+        const { availability } = req.body;
+
+        if (!/^[0-9a-fA-F]{24}$/.test(propertyId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid property ID"
+            });
+        }
+
+        if (!["Available", "Not Available"].includes(availability)) {
+            return res.status(400).json({
+                success: false,
+                message: "Availability must be Available or Not Available"
+            });
+        }
+
+        const property = await Property.findById(propertyId);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found"
+            });
+        }
+
+        if (property.owner.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only update your own property availability"
+            });
+        }
+
+        property.availability = availability;
+        await property.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Property availability updated successfully",
+            property
+        });
+
+    } catch (error) {
+        console.error("Update availability error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to update property availability"
+        });
+    }
+};
+
+
 module.exports = {
     addProperty,
     searchProperties,
@@ -456,5 +530,6 @@ module.exports = {
     contactOwner,
     getMyListings,
     updateProperty,
-    deleteProperty
+    deleteProperty,
+    updateAvailability
 };
