@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book PG Accommodation</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Send Booking Request</h1>
+        <p>Enter your details to request accommodation.</p>
+
+        <form id="bookingForm">
+
+            <label for="propertyId">Property ID</label>
+            <input
+                type="text"
+                id="propertyId"
+                placeholder="Enter property ID"
+                required
+            >
+
+            <label for="moveInDate">Expected Move-in Date</label>
+            <input
+                type="date"
+                id="moveInDate"
+                required
+            >
+
+            <label for="message">Message to Owner</label>
+            <textarea
+                id="message"
+                placeholder="Write a message to the property owner"
+                maxlength="500"
+            ></textarea>
+
+            <button type="submit" id="bookingButton">
+                Submit Booking Request
+            </button>
+
+        </form>
+
+        <p id="responseMessage"></p>
+
+        <a href="search.html">Back to Search Properties</a>
+    </div>
+
+    <script src="js/booking.js"></script>
+</body>
+</html>
