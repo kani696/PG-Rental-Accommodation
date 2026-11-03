@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - PG Finder</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="registration-card">
+            <h1>Admin Dashboard</h1>
+            <p class="subtitle">Review and verify property listings.</p>
+
+            <div class="dashboard-stats">
+                <p>Total Listings: <strong id="totalCount">0</strong></p>
+                <p>Pending: <strong id="pendingCount">0</strong></p>
+                <p>Approved: <strong id="approvedCount">0</strong></p>
+                <p>Rejected: <strong id="rejectedCount">0</strong></p>
+            </div>
+
+            <div id="adminMessage">Loading listings...</div>
+            <div id="listingsContainer"></div>
+
+            <p><a href="search.html">Back to Search</a></p>
+            <button id="logoutButton">Logout</button>
+        </div>
+    </div>
+
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>

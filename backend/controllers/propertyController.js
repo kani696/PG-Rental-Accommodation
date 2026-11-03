@@ -82,7 +82,8 @@ const searchProperties = async (req, res) => {
         } = req.query;
 
         const filter = {
-            $or: [
+    verificationStatus: "Approved",
+    $or: [
                 {
                     title: {
                         $regex: search,
@@ -386,9 +387,12 @@ const updateProperty = async (req, res) => {
             });
         }
 
-        Object.assign(property, updates);
+       Object.assign(property, updates);
 
-        await property.save();
+// Edited listings must be reviewed again
+property.verificationStatus = "Pending";
+
+await property.save();
 
         return res.status(200).json({
             success: true,

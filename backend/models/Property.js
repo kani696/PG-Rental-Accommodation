@@ -54,6 +54,12 @@ const propertySchema = new mongoose.Schema(
             type: String,
             enum: ["Available", "Not Available"],
             default: "Available"
+        },
+
+        verificationStatus: {
+            type: String,
+            enum: ["Pending", "Approved", "Rejected"],
+            default: "Pending"
         }
     },
     {

@@ -14,19 +14,28 @@ const {
     updateAvailability
 } = require("../controllers/propertyController");
 
+const {
+    getAllListings,
+    updateVerificationStatus
+} = require("../controllers/adminController");
+
 const router = express.Router();
 
 // Public routes
 router.get("/search", searchProperties);
 router.post("/:id/contact", contactOwner);
 
-// Owner-only listing management
+// Admin routes
+router.get("/admin/listings", protect, getAllListings);
+router.patch("/:id/verification", protect, updateVerificationStatus);
+
+// Owner routes
 router.get("/my-listings", protect, getMyListings);
 router.put("/:id/availability", protect, updateAvailability);
 router.put("/:id", protect, updateProperty);
 router.delete("/:id", protect, deleteProperty);
 
-// Existing property routes
+// Property routes
 router.post("/", protect, addProperty);
 router.get("/:id", getPropertyById);
 

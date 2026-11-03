@@ -1,3 +1,4 @@
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
@@ -10,6 +11,13 @@ const registerUser = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
+            });
+        }
+
+        if (!["student", "owner"].includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid registration role"
             });
         }
 
@@ -59,12 +67,10 @@ const registerUser = async (req, res) => {
     }
 };
 
-
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate required fields
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -72,7 +78,6 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Find user
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -82,7 +87,6 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Compare password with hashed password
         const passwordMatch = await bcrypt.compare(
             password,
             user.password
@@ -95,7 +99,6 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Create JWT token
         const token = jwt.sign(
             {
                 id: user._id,
@@ -128,7 +131,6 @@ const loginUser = async (req, res) => {
         });
     }
 };
-
 
 module.exports = {
     registerUser,

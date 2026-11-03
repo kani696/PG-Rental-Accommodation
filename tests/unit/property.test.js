@@ -38,7 +38,6 @@ describe("Property API Tests", () => {
         jest.clearAllMocks();
     });
 
-    // 1. Successful property submission
     test("Should allow an owner to add a property", async () => {
         jwt.verify.mockReturnValue({
             id: "owner123",
@@ -60,7 +59,6 @@ describe("Property API Tests", () => {
         expect(Property.create).toHaveBeenCalled();
     });
 
-    // 2. Missing required fields
     test("Should reject property with missing fields", async () => {
         jwt.verify.mockReturnValue({
             id: "owner123",
@@ -77,7 +75,6 @@ describe("Property API Tests", () => {
         expect(response.status).toBe(400);
     });
 
-    // 3. Student cannot add property
     test("Should reject property submission by a student", async () => {
         jwt.verify.mockReturnValue({
             id: "student123",
@@ -92,7 +89,6 @@ describe("Property API Tests", () => {
         expect(response.status).toBe(403);
     });
 
-    // 4. Negative rent
     test("Should reject negative rent", async () => {
         jwt.verify.mockReturnValue({
             id: "owner123",
@@ -110,7 +106,6 @@ describe("Property API Tests", () => {
         expect(response.status).toBe(400);
     });
 
-    // 5. Missing authentication
     test("Should reject property submission without a token", async () => {
         const response = await request(app)
             .post("/api/properties")
@@ -138,6 +133,7 @@ describe("Property API Tests", () => {
         expect(response.body.count).toBe(1);
 
         expect(Property.find).toHaveBeenCalledWith({
+            verificationStatus: "Approved",
             $or: [
                 {
                     title: {
@@ -171,6 +167,12 @@ describe("Property API Tests", () => {
 
         expect(response.status).toBe(200);
         expect(response.body.count).toBe(1);
+
+        expect(Property.find).toHaveBeenCalledWith(
+            expect.objectContaining({
+                verificationStatus: "Approved"
+            })
+        );
     });
 
     // 8. No matching properties
@@ -199,6 +201,7 @@ describe("Property API Tests", () => {
         expect(response.status).toBe(200);
 
         expect(Property.find).toHaveBeenCalledWith({
+            verificationStatus: "Approved",
             $or: [
                 {
                     title: {
@@ -229,6 +232,7 @@ describe("Property API Tests", () => {
         expect(response.status).toBe(200);
 
         expect(Property.find).toHaveBeenCalledWith({
+            verificationStatus: "Approved",
             $or: [
                 {
                     title: {
@@ -247,7 +251,7 @@ describe("Property API Tests", () => {
         });
     });
 
-    // 11. Filter using multiple conditions
+    // 11. Multiple filters
     test("Should apply rent and room type filters together", async () => {
         Property.find.mockReturnValue({
             sort: jest.fn().mockResolvedValue([])
@@ -259,6 +263,7 @@ describe("Property API Tests", () => {
         expect(response.status).toBe(200);
 
         expect(Property.find).toHaveBeenCalledWith({
+            verificationStatus: "Approved",
             $or: [
                 {
                     title: {
@@ -319,11 +324,10 @@ describe("Property API Tests", () => {
         const response = await request(app)
             .get("/api/properties/invalid-id");
 
-        // Current controller returns 404 for invalid IDs.
         expect([400, 404]).toContain(response.status);
     });
 
-    // 16. Successful contact inquiry
+    // 16. Contact owner
     test("Should save a contact inquiry successfully", async () => {
         Property.findById.mockResolvedValue({
             _id: propertyId,
@@ -358,7 +362,7 @@ describe("Property API Tests", () => {
         expect(ContactMessage.create).not.toHaveBeenCalled();
     });
 
-    // 18. Contact inquiry for nonexistent property
+    // 18. Contact nonexistent property
     test("Should return 404 when contacting a nonexistent property", async () => {
         Property.findById.mockResolvedValue(null);
 
