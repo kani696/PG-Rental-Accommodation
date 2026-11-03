@@ -11,6 +11,7 @@ const authRoutes = require("./routes/authRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const favouriteRoutes = require("./routes/favouriteRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/favourites", favouriteRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Home route
 app.get("/", (req, res) => {

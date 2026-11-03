@@ -1,6 +1,7 @@
 
 const Booking = require("../models/Booking");
 const Property = require("../models/Property");
+const Notification = require("../models/Notification");
 
 // Student sends a booking request
 const createBooking = async (req, res) => {
@@ -61,6 +62,14 @@ const createBooking = async (req, res) => {
             message: message || ""
         });
 
+        await Notification.create({
+            recipient: property.owner,
+            sender: req.user.id,
+            booking: booking._id,
+            message: "You have received a new booking request.",
+            type: "Booking Request"
+        });
+
         return res.status(201).json({
             success: true,
             message: "Booking request submitted successfully",
@@ -110,12 +119,10 @@ const getOwnerDashboard = async (req, res) => {
             });
         }
 
-        // Get properties belonging to this owner
         const properties = await Property.find({
             owner: req.user.id
         }).sort({ createdAt: -1 });
 
-        // Get booking requests received by this owner
         const bookings = await Booking.find({
             owner: req.user.id
         })
@@ -123,7 +130,6 @@ const getOwnerDashboard = async (req, res) => {
             .populate("property", "title location rent")
             .sort({ createdAt: -1 });
 
-        // Calculate booking status counts
         const pending = bookings.filter(
             booking => booking.status === "Pending"
         ).length;
@@ -160,8 +166,68 @@ const getOwnerDashboard = async (req, res) => {
 };
 
 
+// Owner approves or rejects a booking
+const updateBookingStatus = async (req, res) => {
+    try {
+        if (req.user.role !== "owner") {
+            return res.status(403).json({
+                success: false,
+                message: "Only property owners can update booking status"
+            });
+        }
+
+        const { status } = req.body;
+
+        if (!["Approved", "Rejected"].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid booking status"
+            });
+        }
+
+        const booking = await Booking.findOne({
+            _id: req.params.id,
+            owner: req.user.id
+        });
+
+        if (!booking) {
+            return res.status(404).json({
+                success: false,
+                message: "Booking not found"
+            });
+        }
+
+        booking.status = status;
+        await booking.save();
+
+        await Notification.create({
+            recipient: booking.student,
+            sender: req.user.id,
+            booking: booking._id,
+            message: `Your booking request has been ${status.toLowerCase()}.`,
+            type: status === "Approved"
+                ? "Booking Approved"
+                : "Booking Rejected"
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: `Booking ${status.toLowerCase()} successfully`,
+            booking
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
 module.exports = {
     createBooking,
     getMyBookings,
-    getOwnerDashboard
+    getOwnerDashboard,
+    updateBookingStatus
 };

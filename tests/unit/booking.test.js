@@ -13,8 +13,14 @@ jest.mock("../../backend/models/Property", () => ({
     findById: jest.fn()
 }));
 
+jest.mock("../../backend/models/Notification", () => ({
+    create: jest.fn()
+}));
+
 const Booking = require("../../backend/models/Booking");
 const Property = require("../../backend/models/Property");
+const Notification = require("../../backend/models/Notification");
+
 const app = require("../../backend/server");
 
 describe("Booking API Tests", () => {
@@ -36,6 +42,10 @@ describe("Booking API Tests", () => {
         jwt.verify.mockReturnValue({
             id: studentId,
             role: "student"
+        });
+
+        Notification.create.mockResolvedValue({
+            _id: "notification123"
         });
     });
 
@@ -63,6 +73,15 @@ describe("Booking API Tests", () => {
         expect(response.status).toBe(201);
         expect(response.body.success).toBe(true);
         expect(Booking.create).toHaveBeenCalled();
+
+        expect(Notification.create).toHaveBeenCalledWith(
+            expect.objectContaining({
+                recipient: ownerId,
+                sender: studentId,
+                booking: "booking123",
+                type: "Booking Request"
+            })
+        );
     });
 
     test("Should reject booking when required fields are missing", async () => {
