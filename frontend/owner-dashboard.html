@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard - PG Finder</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="registration-card">
+            <h1>Owner Dashboard</h1>
+            <p class="subtitle">
+                Manage your PG properties and booking requests.
+            </p>
+
+            <p id="ownerWelcome"></p>
+
+            <a href="my-listings.html">Manage My Listings</a>
+            |
+            <a href="search.html">Search Properties</a>
+        </div>
+
+        <div id="dashboardMessage" class="registration-card">
+            Loading dashboard...
+        </div>
+
+        <div id="dashboardStats"></div>
+
+        <div class="registration-card">
+            <h2>My Properties</h2>
+            <div id="propertiesContainer">
+                Loading properties...
+            </div>
+        </div>
+
+        <div class="registration-card">
+            <h2>Recent Booking Requests</h2>
+            <div id="bookingsContainer">
+                Loading booking requests...
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/owner-dashboard.js"></script>
+</body>
+</html>
