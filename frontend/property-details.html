@@ -6,14 +6,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Property Details - PG Finder</title>
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .review-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .review-card {
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .stars {
+            color: #f5a623;
+            font-size: 25px;
+            cursor: pointer;
+            letter-spacing: 4px;
+        }
+
+        .star {
+            cursor: pointer;
+        }
+
+        .review-form input,
+        .review-form textarea {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 10px 0;
+            padding: 10px;
+        }
+
+        .review-form button {
+            margin-top: 10px;
+        }
+
+        #reviewResult {
+            margin-top: 10px;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
         <div class="registration-card">
             <h1>Property Details</h1>
+
             <div id="propertyDetails">
                 <p>Loading property details...</p>
             </div>
+
+            <section class="review-section">
+                <h2>Ratings and Reviews</h2>
+
+                <div id="ratingSummary">
+                    Loading ratings...
+                </div>
+
+                <div id="reviewFormSection"></div>
+
+                <h3>Student Reviews</h3>
+
+                <div id="reviewsList">
+                    Loading reviews...
+                </div>
+            </section>
         </div>
     </div>
 
