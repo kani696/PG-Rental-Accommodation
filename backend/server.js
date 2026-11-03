@@ -12,6 +12,7 @@ const propertyRoutes = require("./routes/propertyRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const favouriteRoutes = require("./routes/favouriteRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/properties", propertyRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/favourites", favouriteRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Home route
 app.get("/", (req, res) => {
